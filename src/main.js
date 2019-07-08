@@ -7,6 +7,9 @@ import store from './store'
 import Vant from 'vant'
 import 'vant/lib/index.css'
 
+// 引入rem适配文件
+import 'amfe-flexible'
+
 Vue.use(Vant)
 
 Vue.config.productionTip = false

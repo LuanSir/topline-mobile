@@ -1,6 +1,6 @@
 <template>
   <div>
-
+    <p>Home component</p>
   </div>
 </template>
 
@@ -8,9 +8,11 @@
 export default {
   name: 'Home',
   data () {
-    return {
-
-    }
+    return {}
   }
 }
 </script>
+
+<style lang="less" scoped>
+
+</style>
