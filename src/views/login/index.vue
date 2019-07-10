@@ -4,6 +4,9 @@
     <van-cell-group>
       <van-field
         v-model="user.mobile"
+        v-validate="'required'"
+        name="mobile"
+        :error-message="errors.first('mobile')"
         class="phone"
         clearable
         left-icon="friends-o"
@@ -13,6 +16,9 @@
       <!-- <van-field v-model="user.code" type="password" label="验证码" placeholder="请输入验证码" required /> -->
       <van-field
         v-model="user.code"
+        v-validate="'required'"
+        name="code"
+        :error-message="errors.first('code')"
         class="pwd"
         center
         clearable
@@ -43,17 +49,41 @@ export default {
       }
     }
   },
+  created () {
+    this.configMessage()
+  },
   methods: {
+    // 登录
     async handleLogin () {
       try {
-        const data = await login(this.user)
-        console.log(data)
-        // 通过提交mutation更新vuex容器中的数据
-        this.$store.commit('setUser', data)
+        this.$validator.validate().then(async valid => {
+          // 如果验证没通过就什么都不做
+          if (!valid) {
+            return
+          }
+          // 表单验证通过，提交表单数据
+          const data = await login(this.user)
+          // 通过提交mutation更新vuex容器中的数据
+          this.$store.commit('setUser', data)
+        })
       } catch (err) {
         console.log(err)
         console.log('登录失败')
       }
+    },
+    // 表单验证提示信息
+    configMessage () {
+      const dict = {
+        custom: {
+          mobile: {
+            required: '手机号不能为空'
+          },
+          code: {
+            required: () => '验证码不能为空'
+          }
+        }
+      }
+      this.$validator.localize('zh_CN', dict)
     }
   }
 }
