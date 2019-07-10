@@ -45,18 +45,14 @@ export default {
   },
   methods: {
     async handleLogin () {
-      // const res = await axios({
-      //   method: 'POST',
-      //   url: 'http://toutiao.course.itcast.cn/app/v1_0/authorizations',
-      //   data: this.user
-      // })
-      // console.log(res)
-
       try {
         const data = await login(this.user)
         console.log(data)
+        // 通过提交mutation更新vuex容器中的数据
+        this.$store.commit('setUser', data)
       } catch (err) {
         console.log(err)
+        console.log('登录失败')
       }
     }
   }
