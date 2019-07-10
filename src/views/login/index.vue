@@ -30,7 +30,14 @@
       </van-field>
     </van-cell-group>
     <div>
-      <van-button class="btn" type="info" @click.prevent="handleLogin">登录</van-button>
+      <van-button
+        class="btn"
+        type="info"
+        :loading="loginLoading"
+        loading-type="spinner"
+        @click.prevent="handleLogin"
+      >
+      登录</van-button>
     </div>
   </div>
 </template>
@@ -46,7 +53,8 @@ export default {
       user: {
         mobile: '',
         code: ''
-      }
+      },
+      loginLoading: false
     }
   },
   created () {
@@ -55,21 +63,39 @@ export default {
   methods: {
     // 登录
     async handleLogin () {
+      this.loginLoading = true
       try {
-        this.$validator.validate().then(async valid => {
-          // 如果验证没通过就什么都不做
-          if (!valid) {
-            return
-          }
-          // 表单验证通过，提交表单数据
-          const data = await login(this.user)
-          // 通过提交mutation更新vuex容器中的数据
-          this.$store.commit('setUser', data)
+        // this.$validator.validate().then(async valid => {
+        //   // 如果验证没通过就什么都不做
+        //   if (!valid) {
+        //     return
+        //   }
+        //   // 表单验证通过，提交表单数据
+        //   const data = await login(this.user)
+        //   // 通过提交mutation更新vuex容器中的数据
+        //   this.$store.commit('setUser', data)
+        // })
+        // 这个插件的 JavaScript 验证方法设计的不好，并没有在验证失败的时候抛出异常
+        const valid = this.$validator.validate()
+        // 如果验证失败,就不会往后执行了，登录按钮也恢复
+        if (!valid) {
+          this.loginLoading = false
+          return
+        }
+        // 表单验证通过，提交表单数据
+        const data = await login(this.user)
+        // 通过提交mutation更新vuex容器中的数据
+        this.$store.commit('setUser', data)
+        // 登录成功后先跳转到主页
+        this.$router.push({
+          name: 'Home'
         })
       } catch (err) {
-        console.log(err)
-        console.log('登录失败')
+        // console.log(err)
+        // console.log('登录失败')
+        this.$toast.fail('登录失败')
       }
+      this.loginLoading = false
     },
     // 表单验证提示信息
     configMessage () {
