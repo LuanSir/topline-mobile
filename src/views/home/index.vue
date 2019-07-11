@@ -85,25 +85,37 @@ export default {
     async loadChannels () {
       // 获取容器中存储的用户登录信息，如果有就说明已经登录
       const { user } = this.$store.state
+      let channels = []
       // 如果已经登录
       if (user) {
         // 获取用户自己的频道列表
         const data = await getChannels()
         // 把获取到的频道列表放到要显示的频道列表中
-        this.channels = data.channels
+        channels = data.channels
       } else {
         // 如果未登录
         // 如果有本地存储数据，就使用本地存储数据中的channels，如果没有就请求拿到推荐的频道列表
         // 获取本地存储数据
         const localChannels = JSON.parse(window.localStorage.getItem('channels'))
         if (localChannels) {
-          this.channels = localChannels
+          channels = localChannels
         } else {
           const data = await getChannels()
           console.log(data)
-          this.channels = data.channels
+          channels = data.channels
         }
       }
+      // 修改channels，将这个数据结构修改为满足我们使用的需求
+      // 遍历每一个频道，
+      // 每个频道中的控制当前频道的下拉刷新 loading 状态、当前频道的上拉加载更多的 loading 状态、当前频道数据是否加载完毕
+      // 都由各自的频道单独管理
+      channels.forEach(item => {
+        item.articles = [] // 用来存储当前列表的文章
+        item.downPullLoading = false // 用来控制当前频道的下拉刷新 loading 状态
+        item.upPullLoading = false // 用来控制当前频道的上拉加载更多 loading 状态
+        item.upPullFinished = false // 用来控制当前频道数据是否加载完毕
+      })
+      this.channels = channels
     }
   }
 }
