@@ -2,7 +2,11 @@
   <div>
     <van-nav-bar class="biaoti" title="标题" fixed/>
     <van-tabs class="channel-tabs" v-model="active">
-      <van-tab title="首页">
+      <van-tab
+        v-for="channelItem in channels"
+        :key="channelItem.id"
+        :title="channelItem.name"
+      >
         <!--
           van-pull-refresh组件，下拉刷新
           isLoading用来控制下拉刷新时的loading状态
@@ -31,14 +35,12 @@
           </van-list>
         </van-pull-refresh>
       </van-tab>
-      <van-tab title="标签 2">内容 2</van-tab>
-      <van-tab title="标签 3">内容 3</van-tab>
-      <van-tab title="标签 4">内容 4</van-tab>
     </van-tabs>
   </div>
 </template>
 
 <script>
+import { getChannels } from '@/api/channel'
 export default {
   name: 'Home',
   data () {
@@ -47,10 +49,16 @@ export default {
       list: [],
       loading: false,
       finished: false,
-      isLoading: false
+      isLoading: false,
+      channels: []
     }
   },
+  created () {
+    // 在生命周期开始的时候直接获取频道信息
+    this.loadChannels()
+  },
   methods: {
+    // 上拉列表触发的方法
     onLoad () {
       // 异步更新数据
       setTimeout(() => {
@@ -66,11 +74,36 @@ export default {
         }
       }, 1000)
     },
+    // 下拉列表触发的方法
     onRefresh () {
       setTimeout(() => {
         this.$toast('刷新成功')
         this.isLoading = false
       }, 1000)
+    },
+    // 获取频道
+    async loadChannels () {
+      // 获取容器中存储的用户登录信息，如果有就说明已经登录
+      const { user } = this.$store.state
+      // 如果已经登录
+      if (user) {
+        // 获取用户自己的频道列表
+        const data = await getChannels()
+        // 把获取到的频道列表放到要显示的频道列表中
+        this.channels = data.channels
+      } else {
+        // 如果未登录
+        // 如果有本地存储数据，就使用本地存储数据中的channels，如果没有就请求拿到推荐的频道列表
+        // 获取本地存储数据
+        const localChannels = JSON.parse(window.localStorage.getItem('channels'))
+        if (localChannels) {
+          this.channels = localChannels
+        } else {
+          const data = await getChannels()
+          console.log(data)
+          this.channels = data.channels
+        }
+      }
     }
   }
 }
