@@ -58,7 +58,7 @@ export default {
     this.loadChannels()
   },
   methods: {
-    // 上拉列表触发的方法
+    // 上拉列表加载更多触发的方法
     onLoad () {
       // 异步更新数据
       setTimeout(() => {
@@ -74,7 +74,7 @@ export default {
         }
       }, 1000)
     },
-    // 下拉列表触发的方法
+    // 下拉列表刷新触发的方法
     onRefresh () {
       setTimeout(() => {
         this.$toast('刷新成功')
