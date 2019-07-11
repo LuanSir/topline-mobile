@@ -88,7 +88,7 @@ export default {
         this.$store.commit('setUser', data)
         // 登录成功后先跳转到主页
         this.$router.push({
-          name: 'Home'
+          name: 'home'
         })
       } catch (err) {
         // console.log(err)

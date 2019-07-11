@@ -6,9 +6,16 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      name: 'home',
+      // name: 'home',
       path: '/',
-      component: () => import('@/views/home')
+      component: () => import('@/views/layout'),
+      children: [
+        { // 默认子路由
+          name: 'home',
+          path: '',
+          component: () => import('@/views/home')
+        }
+      ]
     },
     {
       name: 'login',
